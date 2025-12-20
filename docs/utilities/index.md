@@ -1,5 +1,5 @@
 ---
-title: Utilities
+title: Impedance Control
 nav_order: 4
 ---
 

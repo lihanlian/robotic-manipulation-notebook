@@ -1,6 +1,6 @@
 ---
 title: Buttons
-parent: UI Components
+parent: Operational Space Control
 nav_order: 2
 ---
 

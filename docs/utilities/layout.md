@@ -1,6 +1,6 @@
 ---
 title: Layout
-parent: Utilities
+parent: Impedance Control
 ---
 
 # Layout Utilities

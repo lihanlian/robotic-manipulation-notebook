@@ -1,6 +1,6 @@
 ---
 title: Responsive Modifiers
-parent: Utilities
+parent: Impedance Control
 ---
 
 # Responsive modifiers

@@ -1,6 +1,6 @@
 ---
 title: Color
-parent: Utilities
+parent: Impedance Control
 ---
 
 # Color Utilities

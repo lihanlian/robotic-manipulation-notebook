@@ -1,6 +1,6 @@
 ---
 title: Callouts
-parent: UI Components
+parent: Operational Space Control
 nav_order: 7
 ---
 

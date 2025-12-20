@@ -1,5 +1,5 @@
 ---
-title: UI Components
+title: Operational Space Control
 nav_order: 3
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Typography
-parent: Utilities
+parent: Impedance Control
 ---
 
 # Typography Utilities
