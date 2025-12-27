@@ -1,5 +1,5 @@
 ---
-title: Customization
+title: Admittance Control
 nav_order: 6
 ---
 
