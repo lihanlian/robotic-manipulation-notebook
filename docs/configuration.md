@@ -1,6 +1,6 @@
 ---
 title: Visual Servoing
-nav_order: 5
+nav_order: 6.5
 ---
 
 # Visual Servoing
@@ -164,22 +164,6 @@ _note: `footer_content` is deprecated, but still supported. For a better experie
 # Color scheme supports "light" (default) and "dark"
 color_scheme: dark
 ```
-
-<button class="btn js-toggle-dark-mode">Preview dark color scheme</button>
-
-<script>
-const toggleDarkMode = document.querySelector('.js-toggle-dark-mode');
-
-jtd.addEvent(toggleDarkMode, 'click', function(){
-  if (jtd.getTheme() === 'dark') {
-    jtd.setTheme('light');
-    toggleDarkMode.textContent = 'Preview dark color scheme';
-  } else {
-    jtd.setTheme('dark');
-    toggleDarkMode.textContent = 'Return to the light side';
-  }
-});
-</script>
 
 See [Planning]({% link docs/customization.md %}) for more information.
 
