@@ -1,10 +1,10 @@
 ---
-title: Labels
-parent: UI Components
+title: singularities
+parent: Kinematics
 nav_order: 3
 ---
 
-# Labels
+# singularities
 
 Use labels as a way to add an additional mark to a section of your docs. Labels come in a few colors. By default, labels will be blue.
 

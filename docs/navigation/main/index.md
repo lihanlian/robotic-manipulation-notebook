@@ -1,6 +1,6 @@
 ---
 title: Main Navigation
-parent: Navigation
+parent: Dynamics
 nav_order: 1
 ---
 

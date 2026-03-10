@@ -1,9 +1,9 @@
 ---
-title: Customization
+title: Planning
 nav_order: 6
 ---
 
-# Customization
+# Planning
 {: .no_toc }
 
 ## Table of contents

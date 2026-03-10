@@ -1,9 +1,9 @@
 ---
-title: Layout
-parent: Utilities
+title: Impedance Control
+parent: Control
 ---
 
-# Layout Utilities
+# Impedance Control
 {: .no_toc }
 
 ## Table of contents

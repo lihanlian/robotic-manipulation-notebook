@@ -1,10 +1,10 @@
 ---
-title: Typography
-parent: UI Components
+title: differential kinematics
+parent: Kinematics
 nav_order: 1
 ---
 
-# Typography
+# differential kinematics
 {: .no_toc }
 
 ## Table of contents

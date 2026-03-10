@@ -1,12 +1,12 @@
 ---
-title: Configuration
-nav_order: 2
+title: Visual Servoing
+nav_order: 5
 ---
 
-# Configuration
+# Visual Servoing
 {: .no_toc }
 
-Just the Docs has some specific configuration parameters that can be defined in your Jekyll site's \_config.yml file.
+This section covers vision-based robot control methods.
 {: .fs-6 .fw-300 }
 
 ## Table of contents
@@ -86,7 +86,7 @@ mermaid:
 
 Provide a `path` instead of a `version` key to load the mermaid library from a local file.
 
-See [the Code documentation]({% link docs/ui-components/code/index.md %}#mermaid-diagram-code-blocks) for more configuration options and information.
+See [the Code documentation]({% link docs/Kinematics/code/index.md %}#mermaid-diagram-code-blocks) for more configuration options and information.
 
 ## Aux links
 
@@ -181,7 +181,7 @@ jtd.addEvent(toggleDarkMode, 'click', function(){
 });
 </script>
 
-See [Customization]({% link docs/customization.md %}) for more information.
+See [Planning]({% link docs/customization.md %}) for more information.
 
 ## Callouts
 {: .d-inline-block }
@@ -220,7 +220,7 @@ You can also adjust the overall level of callouts. Both color schemes use `300` 
 - `quiet` (the default when using the `light` or custom color schemes) uses `-000` as the outline
 - `loud` (the default when using the `dark` color scheme) uses `-300` as the outline
 
-See [Callouts]({% link docs/ui-components/callouts.md %}) for more information. The colors used in the theme are further described in [Color Utilities]({% link docs/utilities/color.md %}).
+See [Callouts]({% link docs/Kinematics/inverse_kinematics.md %}) for more information. The colors used in the theme are further described in [Color Utilities]({% link docs/utilities/color.md %}).
 
 ## Google Analytics
 

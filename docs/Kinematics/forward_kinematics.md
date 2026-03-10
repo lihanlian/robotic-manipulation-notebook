@@ -1,6 +1,6 @@
 ---
-title: Buttons
-parent: UI Components
+title: forward kinematics
+parent: Kinematics
 nav_order: 2
 ---
 

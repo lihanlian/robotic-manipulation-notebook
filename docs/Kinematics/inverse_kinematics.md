@@ -1,6 +1,6 @@
 ---
-title: Callouts
-parent: UI Components
+title: inverse kinematics
+parent: Kinematics
 nav_order: 7
 ---
 

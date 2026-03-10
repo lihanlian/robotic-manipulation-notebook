@@ -1,6 +1,6 @@
 ---
 title: Lists
-parent: UI Components
+parent: Kinematics
 nav_order: 5
 ---
 

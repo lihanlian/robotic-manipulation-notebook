@@ -1,9 +1,9 @@
 ---
-title: Color
-parent: Utilities
+title: Operational Space Control
+parent: Control
 ---
 
-# Color Utilities
+# Operational Space Control
 {: .no_toc }
 
 ## Table of contents

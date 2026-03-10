@@ -1,10 +1,10 @@
 ---
-title: Child Pages
-parent: Navigation
+title: Equations of Motion
+parent: Dynamics
 nav_order: 4
 ---
 
-# Child Pages
+# Equations of Motion
 
 By default, all parent pages will automatically have a so-called 'Table of Contents' at the bottom, showing links to all their child pages.
 

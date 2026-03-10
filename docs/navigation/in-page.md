@@ -1,6 +1,6 @@
 ---
 title: In-Page Navigation
-parent: Navigation
+parent: Dynamics
 nav_order: 5
 ---
 

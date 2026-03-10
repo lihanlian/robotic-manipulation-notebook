@@ -1,10 +1,10 @@
 ---
-title: Layout
+title: Perception
 layout: default
 nav_order: 4.5
 ---
 
-# Layout
+# Perception
 
 You specify the layout for a page in its [front matter]. Just the Docs has a `default` layout with a sidebar, used for almost all pages in the theme docs, and a `minimal` layout that omits the sidebar.
 {: .fs-6 .fw-300 }
@@ -27,7 +27,7 @@ Each page that has child pages generally has a list of links to those pages (you
 
 ## The `minimal` layout
 
-A child and grandchild page of this page use the minimal layout. This differs from the default layout by omitting the sidebar---and thereby also the navigation panel. To navigate between pages with the minimal layout, you can use the breadcrumbs and the tables of contents.
+The `minimal` layout differs from the default layout by omitting the sidebar and navigation panel. Use it only when you explicitly want a clean content-only page.
 
 ## Selectively hiding or showing the sidebar
 

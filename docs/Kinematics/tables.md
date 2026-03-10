@@ -1,10 +1,10 @@
 ---
-title: Tables
-parent: UI Components
+title: orientation representation
+parent: Kinematics
 nav_order: 4
 ---
 
-# Tables
+# orientation representation
 
 Tables are responsive by default, allowing wide tables to have a horizontal scroll to access columns outside of the normal viewport.
 

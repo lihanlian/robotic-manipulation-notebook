@@ -1,9 +1,9 @@
 ---
-title: Typography
-parent: Utilities
+title: Passivity
+parent: Control
 ---
 
-# Typography Utilities
+# Passivity
 {: .no_toc }
 
 ## Table of contents
