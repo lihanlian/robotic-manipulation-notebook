@@ -125,7 +125,7 @@ New (v0.4.0)
 {: .label .label-green }
 
 External links can be added to the navigation through the `nav_external_links` option.
-See [Navigation Structure]({% link docs/navigation/main/external.md %}) for more details.
+See [Navigation Structure]({% link docs/Dynamics/main/external.md %}) for more details.
 
 ## Footer content
 
@@ -165,7 +165,7 @@ _note: `footer_content` is deprecated, but still supported. For a better experie
 color_scheme: dark
 ```
 
-See [Planning]({% link docs/customization.md %}) for more information.
+See [Planning]({% link docs/Planning/index.md %}) for more information.
 
 ## Callouts
 {: .d-inline-block }
@@ -204,7 +204,7 @@ You can also adjust the overall level of callouts. Both color schemes use `300` 
 - `quiet` (the default when using the `light` or custom color schemes) uses `-000` as the outline
 - `loud` (the default when using the `dark` color scheme) uses `-300` as the outline
 
-See [Callouts]({% link docs/Kinematics/inverse_kinematics.md %}) for more information. The colors used in the theme are further described in [Color Utilities]({% link docs/utilities/color.md %}).
+See [Callouts]({% link docs/Kinematics/inverse_kinematics.md %}) for more information. The colors used in the theme are further described in [Color Utilities]({% link docs/Control/osc.md %}).
 
 ## Google Analytics
 

@@ -1,10 +1,10 @@
 ---
-title: inverse dynamics
+title: Inverse Dynamics
 parent: Dynamics
-nav_order: 3
+nav_order: 2
 ---
 
-# inverse dynamics
+# Inverse Dynamics
 
 When using the default layout, all pages except top-level pages will automatically have a list of 'breadcrumbs' at the top, linking to the parent page and to any higher-level ancestors.
 

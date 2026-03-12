@@ -1,10 +1,10 @@
 ---
-title: differential kinematics
+title: Differential Inverse Kinematics
 parent: Kinematics
-nav_order: 1
+nav_order: 3
 ---
 
-# differential kinematics
+# Differential Inverse Kinematics
 {: .no_toc }
 
 ## Table of contents
@@ -110,4 +110,4 @@ Text can be **bold**, _italic_, or ~~strikethrough~~.
 
 There are a number of specific typographic CSS classes that allow you to override default styling for font size, font weight, line height, and capitalization.
 
-[View typography utilities]({% link docs/utilities/typography.md %}){: .btn .btn-outline }
+[View typography utilities]({% link docs/Control/passivity.md %}){: .btn .btn-outline }

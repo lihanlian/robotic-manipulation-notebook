@@ -1,10 +1,10 @@
 ---
-title: singularities
+title: Singularities
 parent: Kinematics
-nav_order: 3
+nav_order: 5
 ---
 
-# singularities
+# Singularities
 
 Use labels as a way to add an additional mark to a section of your docs. Labels come in a few colors. By default, labels will be blue.
 

@@ -1,7 +1,7 @@
 ---
 title: Equations of Motion
 parent: Dynamics
-nav_order: 4
+nav_order: 3
 ---
 
 # Equations of Motion

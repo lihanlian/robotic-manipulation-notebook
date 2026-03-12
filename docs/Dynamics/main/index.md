@@ -1,7 +1,7 @@
 ---
 title: Main Navigation
 parent: Dynamics
-nav_order: 1
+nav_order: 98
 ---
 
 # Main Navigation
@@ -10,7 +10,7 @@ The main navigation for your Just the Docs site is at the left side of the page 
 
 You need to specify the `title` of each page in its front matter. Page titles are independent of file names and directory structure. The navigation uses the title of the page as an anchor for links to the page.
 
-By default, links to all pages appear in the main navigation at the top level, ordered alphabetically by their titles. By adding further fields to the front matter of individual pages, you can [change their order]({% link docs/navigation/main/order.md %}), [exclude pages]({% link docs/navigation/main/exclude.md %}), and change their [parent pages]({% link docs/navigation/main/levels.md %}).
+By default, links to all pages appear in the main navigation at the top level, ordered alphabetically by their titles. By adding further fields to the front matter of individual pages, you can [change their order]({% link docs/Dynamics/main/order.md %}), [exclude pages]({% link docs/Dynamics/main/exclude.md %}), and change their [parent pages]({% link docs/Dynamics/main/levels.md %}).
 
 {: .new-title }
 > New (v0.10.0)

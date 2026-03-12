@@ -13,7 +13,7 @@ Sometimes you will want to create a page with many children. First, it is recomm
 ┌─ ...
 ├─ (Jekyll files)
 ├─ docs
-    ├─ configuration.md
+    ├─ Visual_Servoing/index.md
     ├─ ui-components
         ├─ index.md (parent page)
         ├─ buttons.md
@@ -21,9 +21,9 @@ Sometimes you will want to create a page with many children. First, it is recomm
         ├─ code
             ├─ index.md (parent page)
             └─ line-numbers.md
-        ├─ labels.md
-        ├─ tables.md
-        └─ typography.md
+        ├─ singularities.md
+        ├─ orientation_representation.md
+        └─ differential_inverse_kinematics.md
     ├─ ...
     └─ MIGRATION.md
 ├─ index.md (home page)
