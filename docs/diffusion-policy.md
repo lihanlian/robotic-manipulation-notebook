@@ -1,9 +1,9 @@
 ---
-title: HIL-SERL
-nav_order: 9
+title: Diffusion Policy
+nav_order: 8
 ---
 
-# HIL-SERL
+# Diffusion Policy
 {: .no_toc }
 
 ## Table of contents
