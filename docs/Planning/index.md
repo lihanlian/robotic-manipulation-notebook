@@ -1,9 +1,9 @@
 ---
-title: Planning
+title: Motion Planning
 nav_order: 6
 ---
 
-# Planning
+# Motion Planning
 {: .no_toc }
 
 ## Table of contents

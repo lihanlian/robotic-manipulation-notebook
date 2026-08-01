@@ -1,6 +1,7 @@
 ---
 title: ACT
-nav_order: 7
+parent: Imitation Learning
+nav_order: 3
 ---
 
 # ACT

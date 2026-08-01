@@ -1,6 +1,7 @@
 ---
 title: HIL-SERL
-nav_order: 9
+parent: Reinforcement Learning
+nav_order: 1
 ---
 
 # HIL-SERL

@@ -1,6 +1,7 @@
 ---
 title: Diffusion Policy
-nav_order: 8
+parent: Imitation Learning
+nav_order: 4
 ---
 
 # Diffusion Policy

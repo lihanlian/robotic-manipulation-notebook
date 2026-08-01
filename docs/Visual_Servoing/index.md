@@ -165,7 +165,7 @@ _note: `footer_content` is deprecated, but still supported. For a better experie
 color_scheme: dark
 ```
 
-See [Planning]({% link docs/Planning/index.md %}) for more information.
+See [Motion Planning]({% link docs/Planning/index.md %}) for more information.
 
 ## Callouts
 {: .d-inline-block }

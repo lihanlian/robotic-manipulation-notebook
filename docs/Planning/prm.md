@@ -1,6 +1,6 @@
 ---
 title: PRM
-parent: Planning
+parent: Motion Planning
 nav_order: 2
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: CHOMP
-parent: Planning
+parent: Motion Planning
 nav_order: 3
 ---
 

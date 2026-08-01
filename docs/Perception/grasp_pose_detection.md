@@ -1,7 +1,7 @@
 ---
 title: Grasp Pose Detection
 parent: Perception
-nav_order: 3
+nav_order: 4
 ---
 
 # Grasp Pose Detection

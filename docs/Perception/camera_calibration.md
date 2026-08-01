@@ -2,7 +2,7 @@
 title: Camera Calibration
 layout: default
 parent: Perception
-nav_order: 1
+nav_order: 2
 ---
 
 # Camera Calibration

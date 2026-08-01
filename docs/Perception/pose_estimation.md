@@ -1,7 +1,7 @@
 ---
 title: Pose Estimation
 parent: Perception
-nav_order: 2
+nav_order: 3
 ---
 
 # Pose Estimation
