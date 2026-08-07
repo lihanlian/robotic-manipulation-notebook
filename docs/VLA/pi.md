@@ -1,7 +1,7 @@
 ---
 title: pi
 parent: VLA
-nav_order: 1
+nav_order: 2
 ---
 
 Text can be **bold**, _italic_, or ~~strikethrough~~.

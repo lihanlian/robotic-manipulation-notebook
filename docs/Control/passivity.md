@@ -1,6 +1,7 @@
 ---
 title: Passivity
 parent: Control
+nav_order: 5
 ---
 
 # Passivity

@@ -1,6 +1,7 @@
 ---
 title: Admittance Control
 parent: Control
+nav_order: 3
 ---
 
 # Admittance Control
