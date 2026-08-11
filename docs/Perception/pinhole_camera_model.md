@@ -15,6 +15,89 @@ nav_order: 1
 
 ---
 
+## Overview
+
+The pinhole camera model describes perspective projection from a 3D point to a 2D image. Let a point expressed in the camera frame be $$P_c=[X,Y,Z]^T$$, with the camera center at the origin and the optical axis aligned with the positive $$Z$$-axis. Although a physical sensor lies behind the pinhole and forms an inverted image, an equivalent virtual image plane at $$Z=f$$ is usually placed in front of it to simplify the geometry.
+
+<figure style="margin: 1.5rem auto; width: 70%; text-align: center;">
+  <img src="{{ '/assets/images/perception/pinhole-camera/pinhole4.png' | relative_url }}" alt="A 3D point projected through a pinhole onto physical and virtual image planes" style="display: block; width: 100%; height: auto;">
+  <figcaption style="margin-top: 0.5rem; font-style: italic;">Perspective projection using physical and virtual image planes. Source: <a href="https://csundergrad.science.uoit.ca/courses/cv-notes/notebooks/01-image-formation.html">Image Formation</a>.</figcaption>
+</figure>
+
+By similar triangles, the ray from $$P_c$$ through the camera center intersects the virtual image plane at
+
+$$
+\begin{bmatrix}
+X \\
+Y \\
+Z
+\end{bmatrix}
+\longmapsto
+\begin{bmatrix}
+fX/Z \\
+fY/Z \\
+f
+\end{bmatrix}.
+$$
+
+Dropping the fixed third coordinate gives the image-plane location $$(fX/Z,fY/Z)$$. Dividing it by $$f$$ gives the normalized image coordinates used later in this chapter:
+
+$$
+x=\frac{X}{Z},
+\qquad
+y=\frac{Y}{Z}.
+$$
+
+<figure style="margin: 1.5rem auto; width: 75%; text-align: center;">
+  <img src="{{ '/assets/images/perception/pinhole-camera/camera-geometry.png' | relative_url }}" alt="Pinhole camera geometry showing the camera center, image plane, principal axis, and principal point" style="display: block; width: 100%; height: auto;">
+  <figcaption style="margin-top: 0.5rem; font-style: italic;">Ideal pinhole-camera geometry. Image from <cite>Multiple View Geometry in Computer Vision</cite>, Second Edition, via <a href="https://csundergrad.science.uoit.ca/courses/cv-notes/notebooks/01-image-formation.html">Image Formation</a>.</figcaption>
+</figure>
+
+In this geometry:
+
+- the **camera center** $$C$$ is the center of projection;
+
+- the **image plane** is the plane at $$Z=f$$;
+
+- the **principal axis** is perpendicular to the image plane and passes through $$C$$;
+
+- the **principal point** is where the principal axis intersects the image plane;
+
+- the **principal plane** passes through $$C$$ and is parallel to the image plane.
+
+If the same point is initially expressed in the world frame as $$P_w=[X_w,Y_w,Z_w,1]^T$$, the extrinsic matrix $$[R\mid t]$$ first rotates and translates it into the camera frame. The intrinsic matrix $$K$$ then converts the camera-frame coordinates into homogeneous pixel coordinates:
+
+$$
+P_c
+=
+\begin{bmatrix}
+X \\
+Y \\
+Z
+\end{bmatrix}
+=
+[R\mid t]P_w,
+$$
+
+$$
+Z
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix}
+=
+KP_c
+=
+K[R\mid t]P_w
+=
+PP_w,
+\qquad
+P=K[R\mid t].
+$$
+
+Thus, $$[R\mid t]$$ determines where the point is relative to the camera, while $$K$$ determines where its viewing ray appears in the pixel coordinate system. Together they form the $$3\times4$$ camera projection matrix $$P$$.
+
 ## 13. Complete intrinsic matrix
 
 The general intrinsic matrix is
