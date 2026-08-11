@@ -35,271 +35,477 @@ favicon_ico: "/assets/images/favicon.ico"
 
 If the path to your favicon is `/favicon.ico`, you can leave `favicon_ico` unset.
 
-## Search
+## What exactly is $$P$$?
 
-```yaml
-# Enable or disable the site search
-# Supports true (default) or false
-search_enabled: true
+<figure style="margin: 1.5rem auto; width: 80%; text-align: center;">
+  <img src="{{ '/assets/images/perception/pinhole-camera/image.png' | relative_url }}" alt="World and camera coordinate frames" style="display: block; width: 100%; height: auto;">
+  <figcaption style="margin-top: 0.5rem; font-style: italic;">Coordinate illustration.</figcaption>
+</figure>
 
-search:
-  # Split pages into sections that can be searched individually
-  # Supports 1 - 6, default: 2
-  heading_level: 2
-  # Maximum amount of previews per search result
-  # Default: 3
-  previews: 3
-  # Maximum amount of words to display before a matched word in the preview
-  # Default: 5
-  preview_words_before: 5
-  # Maximum amount of words to display after a matched word in the preview
-  # Default: 10
-  preview_words_after: 10
-  # Set the search token separator
-  # Default: /[\s\-/]+/
-  # Example: enable support for hyphenated search words
-  tokenizer_separator: /[\s/]+/
-  # Display the relative url in search results
-  # Supports true (default) or false
-  rel_url: true
-  # Enable or disable the search button that appears in the bottom right corner of every page
-  # Supports true or false (default)
-  button: false
-  # Focus the search input by pressing `ctrl + focus_shortcut_key` (or `cmd + focus_shortcut_key` on macOS)
-  focus_shortcut_key: 'k'
-```
+Suppose a physical point is fixed in the world. Its coordinates in the world frame are
 
-## Mermaid Diagrams
-{: .d-inline-block }
+$$
+P_w =
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w
+\end{bmatrix}.
+$$
 
-New (v0.4.0)
-{: .label .label-green }
+Let the camera have center $$C_w$$, expressed in world coordinates, and orientation $$R_{cw}$$, which rotates a vector from the world frame into the camera frame. The same physical point expressed in the camera frame is
 
-The minimum configuration requires the key for `version` ([from jsDelivr](https://cdn.jsdelivr.net/npm/mermaid/)) in `_config.yml`:
+$$
+\boxed{P_c = R_{cw}(P_w - C_w)}.
+$$
 
-```yaml
-mermaid:
-  # Version of mermaid library
-  # Pick an available version from https://cdn.jsdelivr.net/npm/mermaid/
-  version: "9.1.3"
-```
+Write
 
-Provide a `path` instead of a `version` key to load the mermaid library from a local file.
+$$
+P_c =
+\begin{bmatrix}
+X \\
+Y \\
+Z
+\end{bmatrix}.
+$$
 
-See [the Code documentation]({% link docs/Kinematics/code/index.md %}#mermaid-diagram-code-blocks) for more configuration options and information.
+Therefore:
 
-## Aux links
+- $$P_w$$ is the point expressed in the world frame;
 
-```yaml
-# Aux links for the upper right navigation
-aux_links:
-  "Just the Docs on GitHub":
-    - "//github.com/just-the-docs/just-the-docs"
+- $$P_c$$ is the same physical point expressed in the camera frame;
 
-# Makes Aux links open in a new tab. Default is false
-aux_links_new_tab: false
-```
+- the interaction-matrix derivation uses $$P_c$$, because perspective projection depends on camera-relative coordinates.
 
-## Navigation sidebar
+The pinhole projection
 
-```yaml
-# Enable or disable the side/mobile menu globally
-# Nav menu can also be selectively enabled or disabled using page variables or the minimal layout
-nav_enabled: true
-```
+$$
+x = \frac{X}{Z},
+\qquad
+y = \frac{Y}{Z}
+$$
 
-## Heading anchor links
+must use camera-frame coordinates, because $$Z$$ is depth along the camera optical axis.
 
-```yaml
-# Heading anchor links appear on hover over h1-h6 tags in page content
-# allowing users to deep link to a particular heading on a page.
-#
-# Supports true (default) or false
-heading_anchors: true
-```
+## 2. Why the derivation uses the camera frame
 
-## External navigation links
-{: .d-inline-block }
+An image depends on where the point lies relative to the camera, not where it lies relative to an arbitrary world origin. Knowing only
 
-New (v0.4.0)
-{: .label .label-green }
+$$
+P_w =
+\begin{bmatrix}
+10 \\
+3 \\
+2
+\end{bmatrix}
+$$
 
-External links can be added to the navigation through the `nav_external_links` option.
-See [Navigation Structure]({% link docs/Dynamics/main/external.md %}) for more details.
+does not determine the pixel location. The camera pose is also required.
 
-## Footer content
+After transforming the point into the camera frame,
 
-```yaml
-# Footer content
-# appears at the bottom of every page's main content
-# Note: The footer_content option is deprecated and will be removed in a future major release. Please use `_includes/footer_custom.html` for more robust
-markup / liquid-based content.
-footer_content: "Copyright &copy; 2017-2020 Patrick Marsceill. Distributed by an <a href=\"https://github.com/just-the-docs/just-the-docs/tree/main/LICENSE.txt\">MIT license.</a>"
+$$
+P_c =
+\begin{bmatrix}
+X \\
+Y \\
+Z
+\end{bmatrix},
+$$
 
-# Footer last edited timestamp
-last_edit_timestamp: true # show or hide edit time - page must have `last_modified_date` defined in the frontmatter
-last_edit_time_format: "%b %e %Y at %I:%M %p" # uses ruby's time format: https://ruby-doc.org/stdlib-2.7.0/libdoc/time/rdoc/Time.html
+the coordinates have direct image-formation meanings:
 
-# Footer "Edit this page on GitHub" link text
-gh_edit_link: true # show or hide edit this page link
-gh_edit_link_text: "Edit this page on GitHub."
-gh_edit_repository: "https://github.com/just-the-docs/just-the-docs" # the github URL for your repo
-gh_edit_branch: "main" # the branch that your docs is served from
-# gh_edit_source: docs # the source that your files originate from
-gh_edit_view_mode: "tree" # "tree" or "edit" if you want the user to jump into the editor immediately
-```
+- $$X$$: horizontal displacement relative to the camera;
 
-_note: `footer_content` is deprecated, but still supported. For a better experience we have moved this into an include called `_includes/footer_custom.html` which will allow for robust markup / liquid-based content._
+- $$Y$$: vertical displacement relative to the camera;
 
-- the "page last modified" data will only display if a page has a key called `last_modified_date`, formatted in some readable date format
-- `last_edit_time_format` uses Ruby's DateTime formatter; for examples and information, please refer to the [official Ruby docs on `strftime` formatting](https://docs.ruby-lang.org/en/master/strftime_formatting_rdoc.html)
-- `gh_edit_repository` is the URL of the project's GitHub repository
-- `gh_edit_branch` is the branch that the docs site is served from; defaults to `main`
-- `gh_edit_source` is the source directory that your project files are stored in (should be the same as [site.source](https://jekyllrb.com/docs/configuration/options/))
-- `gh_edit_view_mode` is `"tree"` by default, which brings the user to the github page; switch to `"edit"` to bring the user directly into editing mode
+- $$Z$$: depth along the optical axis.
 
-## Color scheme
+Only then can the normalized projection be formed:
 
-```yaml
-# Color scheme supports "light" (default) and "dark"
-color_scheme: dark
-```
+$$
+x = \frac{X}{Z},
+\qquad
+y = \frac{Y}{Z}.
+$$
 
-See [Motion Planning]({% link docs/Planning/index.md %}) for more information.
+## 3. Step-by-step derivation of the point-motion equation
 
-## Callouts
-{: .d-inline-block }
+Start from
 
-Updated (v0.11.0)
-{: .label .label-yellow }
+$$
+P_c = R_{cw}(P_w - C_w).
+$$
 
-To use this feature, you need to configure a `color` and (optionally) `title` for each kind of callout you want to use, e.g.:
+Assume that the scene point is fixed in the world:
 
-```yaml
-callouts:
-  warning:
-    title: Warning
-    color: red
-```
+$$
+\dot{P}_w = 0.
+$$
 
-This uses the color `$red-300` for the title and left border, and `$red-000` for the other borders. You can then style a paragraph as a `warning` callout like this:
+Differentiate:
 
-```markdown
-{: .warning }
-A paragraph...
-```
+$$
+\dot{P}_c
+=
+\dot{R}_{cw}(P_w-C_w)
+-
+R_{cw}\dot{C}_w.
+$$
 
-{: .warning }
-A paragraph...
+Define the camera translational velocity expressed in the camera frame as
 
-The colors `grey-lt`, `grey-dk`, `purple`, `blue`, `green`, `yellow`, and `red` are predefined; to use a custom color, you need to define its `000` and `300` levels in your SCSS files. For example, to use `pink`, add the following to your `_sass/custom/setup.scss` file:
+$$
+\mathbf{v}_c = R_{cw}\dot{C}_w.
+$$
 
-```scss
-$pink-000: #f77ef1;
-$pink-300: #dd2cd4;
-```
+For a rotating camera frame,
 
-You can also adjust the overall level of callouts. Both color schemes use `300` color level for the title and left border. The difference is for the rest of the border:
+$$
+\dot{R}_{cw}
+=
+-[\omega_c]_\times R_{cw},
+$$
 
-- `quiet` (the default when using the `light` or custom color schemes) uses `-000` as the outline
-- `loud` (the default when using the `dark` color scheme) uses `-300` as the outline
+where
 
-See [Callouts]({% link docs/Kinematics/inverse_kinematics.md %}) for more information. The colors used in the theme are further described in [Color Utilities]({% link docs/Control/osc.md %}).
+$$
+[\omega_c]_\times
+=
+\begin{bmatrix}
+0 & -\omega_z & \omega_y \\
+\omega_z & 0 & -\omega_x \\
+-\omega_y & \omega_x & 0
+\end{bmatrix}
+$$
 
-## Google Analytics
+is the skew-symmetric matrix representing the cross product.
 
-{: .warning }
-> [Google Analytics 4 will replace Universal Analytics](https://support.google.com/analytics/answer/11583528). On **July 1, 2023**, standard Universal Analytics properties will stop processing new hits. The earlier you migrate, the more historical data and insights you will have in Google Analytics 4.
+Because
 
-Universal Analytics (UA) and Google Analytics 4 (GA4) properties are supported.
+$$
+R_{cw}(P_w-C_w)=P_c,
+$$
 
-```yaml
-# Google Analytics Tracking (optional)
-# Supports a CSV of tracking ID strings (eg. "UA-1234567-89,G-1AB234CDE5")
-ga_tracking: UA-2709176-10
-ga_tracking_anonymize_ip: true # Use GDPR compliant Google Analytics settings (true/nil by default)
-```
+we obtain
 
-### Multiple IDs
-{: .d-inline-block .no_toc }
+$$
+\dot{P}_c
+=
+-[\omega_c]_\times P_c
+-
+\mathbf{v}_c.
+$$
 
-New (v0.4.0)
-{: .label .label-green }
+Since
 
-This theme supports multiple comma-separated tracking IDs. This helps seamlessly transition UA properties to GA4 properties by tracking both for a while.
+$$
+[\omega_c]_\times P_c
+=
+\omega_c \times P_c,
+$$
 
-```yaml
-ga_tracking: "UA-1234567-89,G-1AB234CDE5"
-```
+the point-motion equation becomes
 
-## Document collections
+$$
+\boxed{
+\dot{P}_c
+=
+-\mathbf{v}_c
+-
+\omega_c \times P_c
+}.
+$$
 
-By default, the navigation and search include normal [pages](https://jekyllrb.com/docs/pages/).
-You can also use [Jekyll collections](https://jekyllrb.com/docs/collections/) which group documents semantically together.
+Thus, the ambiguous $$P$$ on the lecture slide means
 
-{: .warning }
-> Collection folders always start with an underscore (`_`), e.g. `_tests`. You won't see your collections if you omit the prefix.
+$$
+\boxed{
+P = P_c = [X,Y,Z]^T
+}.
+$$
 
-For example, put all your test files in the `_tests` folder and create the `tests` collection:
+Specifically:
 
-```yaml
-# Define Jekyll collections
-collections:
-  # Define a collection named "tests", its documents reside in the "_tests" directory
-  tests:
-    permalink: "/:collection/:path/"
-    output: true
+$$
+\omega_c \times P_c
+$$
 
-just_the_docs:
-  # Define which collections are used in just-the-docs
-  collections:
-    # Reference the "tests" collection
-    tests:
-      # Give the collection a name
-      name: Tests
-      # Exclude the collection from the navigation
-      # Supports true or false (default)
-      # nav_exclude: true
-      # Fold the collection in the navigation
-      # Supports true or false (default)
-      # nav_fold: true  # note: this option is new in v0.4
-      # Exclude the collection from the search
-      # Supports true or false (default)
-      # search_exclude: true
-```
+where
 
-The navigation for all your normal pages (if any) is displayed before those in collections.
+$$
+\omega_c =
+\begin{bmatrix}
+\omega_x \\
+\omega_y \\
+\omega_z
+\end{bmatrix}
+$$
 
-<span>New (v0.4.0)</span>{: .label .label-green }
-Including `nav_fold: true` in a collection configuration *folds* that collection:
-an expander symbol appears next to the collection name,
-and clicking it displays/hides the links to the top-level pages of the collection.[^js-disabled]
+is the camera angular velocity, and
 
-[^js-disabled]: <span>New (v0.6.0)</span>{: .label .label-green }
-    When JavaScript is disabled in the browser, all folded collections are automatically expanded,
-    since clicking expander symbols has no effect.
-    (In previous releases, navigation into folded collections required JavaScript to be enabled.)
+$$
+P_c =
+\begin{bmatrix}
+X \\
+Y \\
+Z
+\end{bmatrix}
+$$
 
-You can reference multiple collections.
-This creates categories in the navigation with the configured names.
+is the point position in the camera frame.
 
-```yaml
-collections:
-  tests:
-    permalink: "/:collection/:path/"
-    output: true
-  tutorials:
-    permalink: "/:collection/:path/"
-    output: true
+The skew-symmetric matrix is simply a matrix representation of the cross product.
 
-just_the_docs:
-  collections:
-    tests:
-      name: Tests
-    tutorials:
-      name: Tutorials
-```
+Instead of writing:
 
-When *all* your pages are in a single collection, its name is not displayed.
+$$
+\omega_c \times P_c,
+$$
 
-The navigation for each collection is a separate name space for page titles: a page in one collection cannot be a child of a page in a different collection, or of a normal page.
+we write:
+
+$$
+[\omega_c]_\times P_c,
+$$
+
+where
+
+$$
+[\omega_c]_\times
+=
+\begin{bmatrix}
+0 & -\omega_z & \omega_y \\
+\omega_z & 0 & -\omega_x \\
+-\omega_y & \omega_x & 0
+\end{bmatrix},
+$$
+
+because:
+
+$$
+[\omega_c]_\times P_c
+=
+\omega_c \times P_c.
+$$
+
+Let's verify:
+
+$$
+\begin{bmatrix}
+0 & -\omega_z & \omega_y \\
+\omega_z & 0 & -\omega_x \\
+-\omega_y & \omega_x & 0
+\end{bmatrix}
+\begin{bmatrix}
+X \\
+Y \\
+Z
+\end{bmatrix}.
+$$
+
+This gives:
+
+First row:
+
+$$
+-\omega_zY+\omega_yZ,
+$$
+
+which is:
+
+$$
+\omega_yZ-\omega_zY.
+$$
+
+Second row:
+
+$$
+\omega_zX-\omega_xZ.
+$$
+
+Third row:
+
+$$
+-\omega_yX+\omega_xY.
+$$
+
+Therefore:
+
+$$
+[\omega_c]_\times P_c
+=
+\begin{bmatrix}
+\omega_yZ-\omega_zY \\
+\omega_zX-\omega_xZ \\
+\omega_xY-\omega_yX
+\end{bmatrix},
+$$
+
+which is exactly:
+
+$$
+\omega_c \times P_c.
+$$
+
+---
+
+## Why does rotation create a cross product?
+
+This comes from rigid-body kinematics.
+
+For a rotating coordinate frame:
+
+$$
+\dot{P}=-\omega \times P.
+$$
+
+Intuition:
+
+Imagine a camera rotating around its center.
+
+The point itself does not move.
+
+But the coordinate axes attached to the camera rotate.
+
+Therefore, the coordinates of the point change.
+
+For example, if the camera rotates around $$z$$:
+
+$$
+\omega =
+\begin{bmatrix}
+0 \\
+0 \\
+\omega_z
+\end{bmatrix},
+$$
+
+then:
+
+$$
+\omega \times P
+=
+\begin{bmatrix}
+-\omega_zY \\
+\omega_zX \\
+0
+\end{bmatrix}.
+$$
+
+The point moves in a circular pattern in the camera coordinate system.
+
+This is exactly what the cross product describes.
+
+---
+
+## 2. Your second question: is the multiplication order valid?
+
+You wrote:
+
+> I got the part where $$R_{cw}(P_w-C_w)=P_c$$, but there is a cross product operator in front of $$R_{cw}$$. Is it okay to do the vector multiplication $$R_{cw}(P_w-C_w)$$ first?
+
+Yes. It is not only valid, it is exactly what we do.
+
+Let's carefully look at the term:
+
+$$
+\dot{R}_{cw}(P_w-C_w)
+$$
+
+and substitute:
+
+$$
+\dot{R}_{cw}
+=
+-[\omega_c]_\times R_{cw}.
+$$
+
+Then:
+
+$$
+\dot{R}_{cw}(P_w-C_w)
+$$
+
+becomes:
+
+$$
+\left(-[\omega_c]_\times R_{cw}\right)(P_w-C_w).
+$$
+
+By matrix associativity:
+
+$$
+\left(-[\omega_c]_\times R_{cw}\right)(P_w-C_w)
+=
+-[\omega_c]_\times
+\left(R_{cw}(P_w-C_w)\right).
+$$
+
+Now:
+
+$$
+R_{cw}(P_w-C_w)=P_c,
+$$
+
+therefore:
+
+$$
+-[\omega_c]_\times
+\left(R_{cw}(P_w-C_w)\right)
+=
+-[\omega_c]_\times P_c,
+$$
+
+or:
+
+$$
+-[\omega_c]_\times P_c
+=
+-\omega_c \times P_c.
+$$
+
+So your reasoning:
+
+> First calculate $$R_{cw}(P_w-C_w)$$
+
+is exactly correct.
+
+The important point:
+
+Matrix multiplication is associative:
+
+$$
+ABC=A(BC)=(AB)C,
+$$
+
+but not commutative:
+
+$$
+AB \neq BA.
+$$
+
+So you can regroup:
+
+$$
+([\omega]_\times R)(P_w-C)
+$$
+
+into:
+
+$$
+[\omega]_\times\left(R(P_w-C)\right),
+$$
+
+but you cannot swap:
+
+$$
+R[\omega]_\times
+$$
+
+and
+
+$$
+[\omega]_\times R.
+$$
