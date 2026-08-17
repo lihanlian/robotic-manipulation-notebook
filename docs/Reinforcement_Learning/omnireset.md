@@ -1,7 +1,7 @@
 ---
 title: OmniReset
 parent: Reinforcement Learning
-nav_order: 2
+nav_order: 3
 ---
 
 # OmniReset
