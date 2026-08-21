@@ -1,180 +1,37 @@
 ---
 title: Inverse Kinematics
 parent: Kinematics
-nav_order: 2
+nav_order: 3
 ---
 
-# Callouts
-{: .d-inline-block }
+# Inverse Kinematics
+{: .no_toc }
 
-New (v0.4.0)
-{: .label .label-green }
-
-Markdown does not include support for callouts. However, you can style text as a callout using a Markdown extension supported by kramdown: [*block IALs*](https://kramdown.gettalong.org/quickref.html#block-attributes).
-
-Common kinds of callouts include `highlight`, `important`, `new`, `note`, and `warning`.
-
-{: .warning }
-These callout names are *not* pre-defined by the theme: you need to define your own names.
-
-When you have [configured]({% link docs/Visual_Servoing/index.md %}#callouts) the  `color` and (optional) `title` for a callout, you can apply it to a paragraph, or to a block quote with several paragraphs, as illustrated below.[^postfix]
-
-[^postfix]:
-    You can put the callout markup either before or after its content.
-
-The following examples were generated with this configuration:
-
-```yml
-callouts:
-  highlight:
-    color: yellow
-  important:
-    title: Important
-    color: blue
-  new:
-    title: New
-    color: green
-  note:
-    title: Note
-    color: purple
-  warning:
-    title: Warning
-    color: red
-```
-
-## An untitled callout
+## Table of contents
 {: .no_toc .text-delta }
 
-```markdown
-{: .highlight }
-A paragraph
-```
+1. TOC
+{:toc}
 
-{: .highlight }
-A paragraph
+---
 
-
-## A single paragraph callout
-{: .no_toc .text-delta }
-
-```markdown
-{: .note }
-A paragraph
-```
-
-{: .note }
-A paragraph
-
-```markdown
-{: .note-title }
-> My note title
->
-> A paragraph with a custom title callout
-```
-
-{: .note-title }
-> My note title
->
-> A paragraph with a custom title callout
-
-## A multi-paragraph callout
-{: .no_toc .text-delta }
-
-```markdown
-{: .important }
-> A paragraph
->
-> Another paragraph
->
-> The last paragraph
-```
-
-{: .important }
-> A paragraph
->
-> Another paragraph
->
-> The last paragraph
-
-```markdown
-{: .important-title }
-> My important title
->
-> A paragraph
->
-> Another paragraph
->
-> The last paragraph
-```
-
-{: .important-title }
-> My important title
->
-> A paragraph
->
-> Another paragraph
->
-> The last paragraph
-
-## An indented callout
-{: .no_toc .text-delta }
-
-```markdown
-> {: .highlight }
-  A paragraph
-```
-
-> {: .highlight }
-  A paragraph
-
-## Indented multi-paragraph callouts
-{: .no_toc .text-delta }
-
-```markdown
-> {: .new }
-> > A paragraph
-> >
-> > Another paragraph
-> >
-> > The last paragraph
-```
-
-> {: .new }
-> > A paragraph
-> >
-> > Another paragraph
-> >
-> > The last paragraph
+Inverse kinematics determines the joint configuration required to place a robot’s end effector at a desired position and orientation. In contrast to forward kinematics, which maps joint variables to a unique pose, inverse kinematics may admit one solution, multiple solutions, infinitely many solutions, or no feasible solution. It can be formulated as either a root-finding problem, where the pose error is driven to zero, or an optimization problem that minimizes the remaining error. Common approaches include analytical solutions and iterative numerical methods based on the manipulator Jacobian. Their performance depends on robot geometry, target reachability, singularities, constraints, and initial configuration.
 
 
-## Nested callouts
-{: .no_toc .text-delta }
+## IK Problem Formulation
 
-```markdown
-{: .important }
-> {: .warning }
-> A paragraph
-```
+- Pose combines translation and rotation
+- Common orientation representations include rotation matrices, Euler angles, and quaternions
+- Transformations map points and frames between coordinate systems
 
-{: .important }
-> {: .warning }
-> A paragraph
 
-## Opaque background
-{: .no_toc .text-delta }
+## Pose Error
 
-```markdown
-{: .important }
-> {: .opaque }
-> <div markdown="block">
-> {: .warning }
-> A paragraph
-> </div>
-```
+## Numerical Inverse Kinematics
 
-{: .important }
-> {: .opaque }
-> <div markdown="block">
-> {: .warning }
-> A paragraph
-> </div>
+## Numerical IK versus Differential IK
+
+----
+Reference:
+
+- <i class="fa-solid fa-book" aria-hidden="true"></i> [MuJoCo XML Reference (actuator)](https://mujoco.readthedocs.io/en/3.3.7/XMLreference.html#actuator-position).

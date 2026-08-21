@@ -1,7 +1,7 @@
 ---
 title: Operational Space Control
 parent: Control
-nav_order: 1
+nav_order: 2
 ---
 
 # Operational Space Control

@@ -1,7 +1,7 @@
 ---
 title: Code
 parent: Kinematics
-nav_order: 6
+nav_order: 5
 ---
 
 # Code

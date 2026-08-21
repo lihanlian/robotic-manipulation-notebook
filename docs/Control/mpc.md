@@ -1,7 +1,7 @@
 ---
 title: Model Predictive Control
 parent: Control
-nav_order: 4
+nav_order: 5
 ---
 
 # MPC

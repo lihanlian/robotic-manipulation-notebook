@@ -1,10 +1,10 @@
 ---
-title: Differential Inverse Kinematics
-parent: Kinematics
-nav_order: 3
+title: Differential IK and QP Control
+parent: Control
+nav_order: 1
 ---
 
-# Differential Inverse Kinematics
+# Differential IK and QP Control
 {: .no_toc }
 
 ## Table of contents

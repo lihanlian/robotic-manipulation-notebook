@@ -1,10 +1,10 @@
 ---
-title: Singularities
+title: Singularities and Nullspace
 parent: Kinematics
-nav_order: 5
+nav_order: 4
 ---
 
-# Singularities
+# Singularities and Nullspace
 
 Use labels as a way to add an additional mark to a section of your docs. Labels come in a few colors. By default, labels will be blue.
 
