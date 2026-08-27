@@ -17,6 +17,11 @@ nav_order: 2
 
 ## Basic button styles
 
+- Pose combines translation and rotation
+- Common orientation representations include rotation matrices, Euler angles, and quaternions
+- Transformations map points and frames between coordinate systems
+
+
 ### Links that look like buttons
 
 <div class="code-example" markdown="1">
