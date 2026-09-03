@@ -71,9 +71,16 @@ Because the approximation is only accurate near the current configuration, the s
 
 ### Pose-Error Convention
 
-The damped least-squares derivation does not require one particular pose-error representation. However, the error vector and Jacobian must use the same component ordering and reference frame.
+A pose error describes the correction required to move the end effector from its current pose to the desired pose. Damped least squares does not require one particular error representation, but the error vector and Jacobian must use the same reference frame and component ordering.
 
-For example, a full body-frame pose error can be defined as
+The subscripts indicate what each error represents:
+
+* $$e_p$$: position error, where $$p$$ stands for position;
+* $$e_R$$: orientation error, where $$R$$ refers to the rotation matrix;
+* $$e_b$$: full pose error expressed in the body frame, where $$b$$ stands for body;
+* $$e$$: the complete error vector used by the solver.
+
+A full body-frame pose error can be defined as
 
 $$
 e_b(q)
@@ -84,17 +91,53 @@ T(q)^{-1}T_d
 \right)^\vee.
 $$
 
-This error should be paired with a body Jacobian.
+Here, $$T(q)$$ is the current end-effector pose and $$T_d$$ is the desired pose. <span style="color: red"> The relative transformation $$T(q)^{-1}T_d$$ describes the motion from the current pose to the desired pose, expressed in the current end-effector frame. </span> Its logarithm produces a six-dimensional error containing both translational and rotational corrections. Because $$e_b(q)$$ is expressed in the body frame, it should be paired with a body Jacobian.
 
-The attached `diffik_dls.py` instead uses a split, world-aligned pose error. Its position error is
+The aforementioned implementation (`diffik_dls.py`) instead uses separate position and orientation errors expressed in a world-aligned frame. The position error is
 
 $$
-e_p(q)
+e_p(q)=p_d-p(q),
+$$
+
+where $$p(q)$$ is the current end-effector position and $$p_d$$ is the desired position.
+
+The order is desired minus current because the result points from the current position toward the target. This sign can be derived from the local position approximation
+
+$$
+p(q+\Delta q)
+\approx
+p(q)+J_p(q)\Delta q.
+$$
+
+To make the next position approach $$p_d$$, set
+
+$$
+p(q)+J_p(q)\Delta q
+\approx
+p_d.
+$$
+
+Rearranging gives
+
+$$
+J_p(q)\Delta q
+\approx
+p_d-p(q)
 =
-p_d-p(q),
+e_p(q).
 $$
 
-and its orientation error corresponds to
+Therefore, using desired minus current allows the correction to appear directly on the right-hand side of the IK equation. If the error were instead defined as current minus desired, the correction equation would require an additional negative sign:
+
+$$
+J_p(q)\Delta q
+\approx
+-\left(p(q)-p_d\right).
+$$
+
+Both conventions are mathematically valid, but the error definition and update equation must be consistent. Using desired minus current is intuitive because a positive feedback gain produces motion toward the target.
+
+Orientations cannot be subtracted directly like position vectors. Instead, the world-aligned orientation error is defined using the relative rotation
 
 $$
 e_R(q)
@@ -102,10 +145,26 @@ e_R(q)
 \operatorname{Log}
 \left(
 R_dR(q)^T
-\right)^\vee.
+\right)^\vee,
 $$
 
-The complete error vector is ordered as
+where $$R(q)$$ is the current orientation and $$R_d$$ is the desired orientation. The multiplication order follows from
+
+$$
+R_{\mathrm{err}}R(q)=R_d,
+$$
+
+which gives
+
+$$
+R_{\mathrm{err}}
+=
+R_dR(q)^T.
+$$
+
+Thus, $$R_dR(q)^T$$ is the rotation that transforms the current orientation toward the desired orientation, expressed in the world-aligned frame. The logarithm converts this rotation matrix into a three-dimensional rotation vector.
+
+The complete error used by the code is
 
 $$
 e(q)
@@ -117,9 +176,9 @@ e_R(q)
 \in\mathbb{R}^6,
 $$
 
-with translation first and rotation second.
+with position error first and orientation error second.
 
-The matching MuJoCo site Jacobian is
+The matching Jacobian is
 
 $$
 J(q)
@@ -131,14 +190,15 @@ J_\omega(q)
 \in\mathbb{R}^{6\times n},
 $$
 
-where $$J_p$$ maps joint motion to world-aligned linear motion and $$J_\omega$$ maps joint motion to world-aligned angular motion.
+where $$J_p(q)$$ maps joint motion to linear end-effector motion and $$J_\omega(q)$$ maps joint motion to angular end-effector motion.
 
 This ordering matches the code:
 
-- `self._jacobian[:3]` contains the translational Jacobian;
-- `self._jacobian[3:]` contains the rotational Jacobian;
-- `self._task_velocity[:3]` contains linear velocity;
-- `self._task_velocity[3:]` contains angular velocity.
+* `self._jacobian[:3]` contains $$J_p$$, the translational Jacobian;
+* `self._jacobian[3:]` contains $$J_\omega$$, the rotational Jacobian;
+* `self._task_velocity[:3]` contains the commanded linear velocity;
+* `self._task_velocity[3:]` contains the commanded angular velocity.
+
 
 ### Iterative Algorithm
 
@@ -687,3 +747,4 @@ The remainder of this section focuses on numerical IK as a configuration solver.
 Reference:
 
 - <i class="fa-solid fa-book" aria-hidden="true"></i> [MuJoCo XML Reference (actuator)](https://mujoco.readthedocs.io/en/3.3.7/XMLreference.html#actuator-position).
+- <i class="fa-brands fa-chrome"></i> [Levenberg–Marquardt algorithm](https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm)
