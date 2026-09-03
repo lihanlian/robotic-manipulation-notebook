@@ -20,7 +20,7 @@ Inverse kinematics(IK) determines the joint configuration required to place a ro
 IK can be formulated as either a root-finding problem, where the pose error is driven to zero, or an optimization problem that minimizes the remaining error. Here, we focus on the <span style="color: red"> damped least-squares (DLS) </span> approach and corresponding implementation can be found at <i class="fa-brands fa-github" aria-hidden="true"></i> [this repository](https://github.com/lihanlian/robot-manipulator-control/blob/main/controller/diffik_dls.py).
 
 
-## IK Problem Formulation
+## ▪ IK Problem Formulation
 
 IK seeks a joint configuration $$q^\star$$ whose forward kinematics matches a desired end-effector pose:
 
@@ -41,6 +41,33 @@ Here, $$e(q)$$ is a pose-error function that measures the position and orientati
 Analytical IK derives joint solutions directly from robot geometry and can be extremely fast when a closed-form solution exists. However, the derivation is robot-specific and is generally unavailable for arbitrary or redundant manipulators. This section therefore focuses on numerical IK, which can be applied to a much wider range of robot structures.
 
 Numerical inverse kinematics solves this nonlinear equation iteratively. Starting from an initial configuration $$q^0$$, it repeatedly calculates a local joint correction until the pose error becomes sufficiently small.
+
+### Local Linearization
+
+The Jacobian provides the fundamental relationship between joint velocity and end-effector velocity:
+
+$$
+V=J(q)\dot q.
+$$
+
+Here, $$\dot q\in\mathbb{R}^n$$ is the joint-velocity vector, while $$V\in\mathbb{R}^6$$ is the end-effector velocity containing both linear and angular velocity. The Jacobian $$J(q)\in\mathbb{R}^{6\times n}$$ depends on the current joint configuration and describes how motion of each joint affects the end effector. Each column represents the instantaneous end-effector motion produced by one joint moving at unit velocity.
+
+The forward-kinematics mapping is nonlinear, so the complete IK problem is generally not solved in one step. Numerical IK applies the same local relationship to small displacements. Around the current estimate $$q^i$$, a small joint correction $$\Delta q^i$$ produces an approximately linear end-effector correction:
+
+$$
+J(q^i)\Delta q^i
+\approx
+e(q^i),
+$$
+
+where $$e(q^i)$$ is the current pose error. This equation is used to calculate a joint correction that moves the end effector toward the desired pose.
+
+Because the approximation is only accurate near the current configuration, the solver repeatedly:
+
+1. computes the current end-effector pose;
+2. evaluates the current pose error;
+3. computes the current Jacobian;
+4. calculates and applies the next joint correction.
 
 ### Pose-Error Convention
 
@@ -113,25 +140,6 @@ This ordering matches the code:
 - `self._task_velocity[:3]` contains linear velocity;
 - `self._task_velocity[3:]` contains angular velocity.
 
-### Local Linearization
-
-The forward-kinematics mapping is nonlinear, so the complete IK problem is generally not solved in one step. Around the current estimate $$q^i$$, a small joint correction $$\Delta q^i$$ produces an approximately linear end-effector correction:
-
-$$
-J(q^i)\Delta q^i
-\approx
-e(q^i).
-$$
-
-This approximation says that the Jacobian locally converts a joint displacement into an end-effector displacement.
-
-Because the approximation is only valid near the current configuration, the solver must repeatedly recompute:
-
-1. the current end-effector pose;
-2. the current pose error;
-3. the current Jacobian;
-4. the next joint correction.
-
 ### Iterative Algorithm
 
 Starting from an initial guess $$q^0$$, one solver iteration performs:
@@ -164,7 +172,7 @@ $$
 
 The Jacobian and pose error are then recomputed because the linear approximation changes with the configuration.
 
-## Numerical Inverse Kinematics
+## ▪ Numerical Inverse Kinematics
 
 ### Root-Finding and Newton–Raphson Intuition
 
@@ -603,10 +611,9 @@ controlled_jacobian.T @ np.linalg.solve(
     controlled_jacobian @ controlled_jacobian.T + self._regularizer,
     task_velocity,
 )
+```
 
-## Numerical IK versus Differential IK
-
-### Numerical IK versus Differential IK
+## ▪ Numerical IK versus Differential IK
 
 Numerical IK and differential IK use the same local Jacobian model, but they use it for different purposes. Numerical IK repeats the Jacobian-based update as an internal solver step until it obtains a final joint configuration. Differential IK applies the mapping during physical control time to generate joint-velocity commands.
 
