@@ -15,22 +15,28 @@ nav_order: 3
 
 ---
 
-Inverse kinematics determines the joint configuration required to place a robot’s end effector at a desired position and orientation. In contrast to forward kinematics, which maps joint variables to a unique pose, inverse kinematics may admit one solution, multiple solutions, infinitely many solutions, or no feasible solution. It can be formulated as either a root-finding problem, where the pose error is driven to zero, or an optimization problem that minimizes the remaining error. Here, we focus on the <span style="color: red"> damped least-squares (DLS) </span> approach.
+Inverse kinematics(IK) determines the joint configuration required to place a robot’s end effector at a desired position and orientation. In contrast to forward kinematics, which maps joint variables to a unique pose, inverse kinematics may admit one solution, multiple solutions, infinitely many solutions, or no feasible solution. 
+
+IK can be formulated as either a root-finding problem, where the pose error is driven to zero, or an optimization problem that minimizes the remaining error. Here, we focus on the <span style="color: red"> damped least-squares (DLS) </span> approach and corresponding implementation can be found at <i class="fa-brands fa-github" aria-hidden="true"></i> [this repository](https://github.com/lihanlian/robot-manipulator-control/blob/main/controller/diffik_dls.py).
 
 
 ## IK Problem Formulation
 
-Inverse kinematics seeks a joint configuration $$q^\star$$ whose forward kinematics matches a desired end-effector pose:
+IK seeks a joint configuration $$q^\star$$ whose forward kinematics matches a desired end-effector pose:
 
 $$
 T(q^\star)=T_d.
 $$
 
-Equivalently, it searches for a configuration at which the pose error is zero:
+Here, $$T(q)$$ is the forward-kinematics function that maps a joint configuration $$q$$ to the corresponding end-effector pose, while $$T_d$$ is the desired pose.
+
+Equivalently, IK searches for a configuration at which the pose error is zero:
 
 $$
 e(q^\star)=0.
 $$
+
+Here, $$e(q)$$ is a pose-error function that measures the position and orientation difference between the current pose $$T(q)$$ and the desired pose $$T_d$$. When $$e(q)=0$$, the end effector has reached the desired pose.
 
 Analytical IK derives joint solutions directly from robot geometry and can be extremely fast when a closed-form solution exists. However, the derivation is robot-specific and is generally unavailable for arbitrary or redundant manipulators. This section therefore focuses on numerical IK, which can be applied to a much wider range of robot structures.
 
