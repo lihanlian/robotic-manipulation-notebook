@@ -1,5 +1,5 @@
 ---
-title: Differential IK and QP Control
+title: Differential IK
 parent: Control
 nav_order: 1
 ---
@@ -16,6 +16,7 @@ nav_order: 1
 ---
 
 ## Font stack
+Talk about differential ik + null space and qp.
 
 By default, Just the Docs uses a native system font stack for sans-serif fonts:
 
