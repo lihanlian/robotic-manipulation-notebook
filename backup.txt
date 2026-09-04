@@ -1,0 +1,68 @@
+
+Numerical IK and differential IK use the same local Jacobian model, but they use it for different purposes. Numerical IK repeats the Jacobian-based update as an internal solver step until it obtains a final joint configuration. Differential IK applies the mapping during physical control time to generate joint-velocity commands.
+
+For damped least-squares numerical IK, the solver computes
+
+$$
+\Delta q^i
+=
+J(q^i)^T
+\left(
+J(q^i)J(q^i)^T+\lambda^2I
+\right)^{-1}
+e(q^i),
+$$
+
+followed by
+
+$$
+q^{i+1}
+=
+\operatorname{integrate}
+\left(
+q^i,\alpha\Delta q^i
+\right).
+$$
+
+Here, $$i$$ is an internal solver-iteration index, and $$\Delta q^i$$ is a joint-configuration correction. It is not necessarily a physically executable joint velocity.
+
+For damped least-squares differential IK, the controller computes
+
+$$
+\dot q_k
+=
+J(q_k)^T
+\left(
+J(q_k)J(q_k)^T+\lambda^2I
+\right)^{-1}
+V_{\mathrm{cmd},k},
+$$
+
+and integrates the velocity over the physical control timestep:
+
+$$
+q_{k+1}
+=
+\operatorname{integrate}
+\left(
+q_k,\Delta t\,\dot q_k
+\right).
+$$
+
+Here, $$k$$ represents physical control time, $$\dot q_k$$ is measured in joint units per second, and $$\Delta t$$ is the controller timestep.
+
+| Aspect | Numerical IK | Differential IK |
+|---|---|---|
+| Primary output | Final joint configuration $$q^\star$$ | Online joint velocity $$\dot q_k$$ |
+| Independent variable | Solver iteration $$i$$ | Physical control step $$k$$ |
+| Jacobian input | Pose error $$e(q^i)$$ | Commanded Cartesian velocity $$V_{\mathrm{cmd},k}$$ |
+| Update process | Repeats internally until convergence | Usually performs one update per control cycle |
+| Meaning of update | $$\Delta q^i$$ is a numerical configuration correction | $$\dot q_k$$ is a physical velocity command |
+| Velocity limits | Not automatically meaningful or enforced | Must be enforced on the commanded velocity |
+| Typical purpose | Solving for a static target configuration | Online Cartesian tracking and feedback control |
+| Execution | Requires a trajectory generator or controller to reach $$q^\star$$ | Directly generates commands during robot operation |
+| Constraints | Basic DLS does not enforce joint or collision constraints | Constraints can be incorporated through a velocity-level QP |
+
+Damped least squares alone does not enforce joint-position or joint-velocity limits in either formulation. Numerical IK requires a constrained solver when the final configuration must remain within joint bounds. Differential IK commonly uses a quadratic program to enforce velocity limits and predictive joint-position constraints during online control.
+
+The remainder of this section focuses on numerical IK as a configuration solver. Differential IK and its constrained QP formulation are developed later as online control methods.

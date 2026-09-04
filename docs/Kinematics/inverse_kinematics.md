@@ -17,7 +17,7 @@ nav_order: 3
 
 Inverse kinematics(IK) determines the joint configuration required to place a robot’s end effector at a desired position and orientation. In contrast to forward kinematics, which maps joint variables to a unique pose, inverse kinematics may admit one solution, multiple solutions, infinitely many solutions, or no feasible solution. 
 
-IK can be formulated as either a root-finding problem, where the pose error is driven to zero, or an optimization problem that minimizes the remaining error. Here, we focus on the <span style="color: red"> damped least-squares (DLS) </span> approach and corresponding implementation can be found at <i class="fa-brands fa-github" aria-hidden="true"></i> [this repository](https://github.com/lihanlian/robot-manipulator-control/blob/main/controller/diffik_dls.py).
+IK can be formulated as either a root-finding problem, where the pose error is driven to zero, or an optimization problem that minimizes the remaining error. Here, we focus on the <span style="color: red"> damped least-squares (DLS) </span> approach (also known as [Levenberg–Marquardt algorithm](https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm)) and corresponding implementation can be found at <i class="fa-brands fa-github" aria-hidden="true"></i> [this repository](https://github.com/lihanlian/robot-manipulator-control/blob/main/controller/diffik_dls.py).
 
 
 ## ▪ IK Problem Formulation
@@ -234,459 +234,347 @@ The Jacobian and pose error are then recomputed because the linear approximation
 
 ## ▪ Numerical Inverse Kinematics
 
-### Root-Finding and Newton–Raphson Intuition
+### Gauss–Newton Method
 
-Consider a general root-finding problem:
-
-$$
-r(q)=0.
-$$
-
-Linearizing the residual around the current estimate $$q^i$$ gives
+Numerical inverse kinematics can be formulated as the nonlinear least-squares problem
 
 $$
-r(q^i+\Delta q^i)
+\min_q \Phi(q),
+\qquad
+\Phi(q)
+=
+\frac{1}{2}\|e(q)\|^2,
+$$
+
+where $$e(q)$$ measures the difference between the current and desired end-effector poses.
+
+This has the same mathematical structure as nonlinear curve fitting. In curve fitting, model parameters are adjusted until the model output matches the observed data. In IK, the joint configuration $$q$$ is adjusted until the pose predicted by forward kinematics matches the desired pose.
+
+Let $$x(q)$$ denote the end-effector task coordinates obtained from forward kinematics and let $$x_d$$ denote the desired task coordinates. Using the desired-minus-current convention, the error is
+
+$$
+e(q)=x_d-x(q).
+$$
+
+Around the current estimate $$q^i$$, the forward-kinematics mapping is approximated by its first-order linearization:
+
+$$
+x(q^i+\Delta q^i)
 \approx
-r(q^i)+J_r(q^i)\Delta q^i,
+x(q^i)+J(q^i)\Delta q^i.
 $$
 
-where
+Here, $$\Delta q^i$$ is a small joint correction and $$J(q^i)$$ is the manipulator Jacobian evaluated at the current configuration.
+
+The error after applying this correction is therefore approximately
 
 $$
-J_r(q^i)
-=
-\frac{\partial r}{\partial q}
-\bigg|_{q=q^i}
+\begin{aligned}
+e(q^i+\Delta q^i)
+&=
+x_d-x(q^i+\Delta q^i)\\
+&\approx
+x_d-\left[x(q^i)+J(q^i)\Delta q^i\right]\\
+&=
+e(q^i)-J(q^i)\Delta q^i.
+\end{aligned}
 $$
 
-is the Jacobian of the residual.
-
-Newton–Raphson chooses a correction that makes the local approximation equal to zero:
+Gauss–Newton selects the joint correction that minimizes the squared norm of this locally predicted error:
 
 $$
-r(q^i)+J_r(q^i)\Delta q^i=0.
-$$
-
-Therefore,
-
-$$
-J_r(q^i)\Delta q^i
-=
--r(q^i).
-$$
-
-If the pose error uses the desired-minus-current convention,
-
-$$
-e(q)=-r(q),
-$$
-
-then the correction must approximately satisfy
-
-$$
-J(q^i)\Delta q^i
-=
-e(q^i).
-$$
-
-For a square and nonsingular Jacobian, this gives
-
-$$
-\Delta q^i
-=
-J(q^i)^{-1}e(q^i).
-$$
-
-The next estimate is then
-
-$$
-q^{i+1}
-=
-q^i+\Delta q^i.
-$$
-
-This is the Newton–Raphson interpretation of numerical IK: locally linearize the nonlinear root equation, solve the linearized equation, update the configuration, and repeat.
-
-Robot Jacobians, however, may be nonsquare or nearly singular. Direct Jacobian inversion is therefore generally unsuitable.
-
-### Damped Least-Squares Formulation
-
-Let
-
-$$
-J\in\mathbb{R}^{m\times n},
-$$
-
-where $$m$$ is the task dimension and $$n$$ is the number of joint-velocity variables. For full pose control, $$m=6$$.
-
-Damped least squares calculates the joint correction by solving
-
-$$
-\min_{\Delta q}
-\;
+\min_{\Delta q^i}
 \frac{1}{2}
 \left\|
-J\Delta q-e
-\right\|^2
-+
-\frac{\rho}{2}
-\|\Delta q\|^2,
-$$
-
-where $$\rho>0$$ is the regularization coefficient.
-
-The first term minimizes the locally predicted pose error:
-
-$$
-\frac{1}{2}
-\left\|
-J\Delta q-e
+e(q^i)-J(q^i)\Delta q^i
 \right\|^2.
 $$
 
-The second term penalizes excessively large joint corrections:
+For compactness, let
 
 $$
-\frac{\rho}{2}
-\|\Delta q\|^2.
+e=e(q^i),
+\qquad
+J=J(q^i),
+\qquad
+\Delta q=\Delta q^i.
 $$
 
-The code adds `config.damping` directly to $$JJ^T$$:
+Because changing the sign does not change a squared norm,
 
 $$
-JJ^T+\texttt{damping}\,I.
-$$
-
-Therefore, this section uses
-
-$$
-\rho
+\|e-J\Delta q\|^2
 =
-\texttt{config.damping}.
+\|J\Delta q-e\|^2.
 $$
 
-Many textbooks instead write the regularizer as $$\lambda^2I$$. Under that convention,
-
-$$
-\rho=\lambda^2.
-$$
-
-Thus, the code variable called `damping` corresponds to the complete regularization coefficient, not necessarily to the unsquared textbook parameter $$\lambda$$.
-
-### Step-by-step derivation of the DLS solution
-
-Define the damped least-squares objective
+The local least-squares objective can therefore be written as
 
 $$
 \mathcal{L}(\Delta q)
 =
 \frac{1}{2}
-\left(
-J\Delta q-e
-\right)^T
-\left(
-J\Delta q-e
-\right)
-+
-\frac{\rho}{2}
-\Delta q^T\Delta q.
+(J\Delta q-e)^T(J\Delta q-e).
 $$
 
 First, expand the squared-error term:
 
 $$
 \begin{aligned}
-\left(
-J\Delta q-e
-\right)^T
-\left(
-J\Delta q-e
-\right)
+(J\Delta q-e)^T(J\Delta q-e)
 &=
 \Delta q^TJ^TJ\Delta q
--
-\Delta q^TJ^Te\\
+-\Delta q^TJ^Te\\
 &\quad
--
-e^TJ\Delta q
-+
-e^Te.
+-e^TJ\Delta q
++e^Te.
 \end{aligned}
 $$
 
-Because both cross terms are scalars,
+The two cross terms are scalars. A scalar is equal to its transpose, so
 
 $$
 e^TJ\Delta q
+=
+\left(e^TJ\Delta q\right)^T
 =
 \Delta q^TJ^Te.
 $$
 
-Therefore,
+The expanded objective is therefore
 
 $$
 \mathcal{L}(\Delta q)
 =
-\frac{1}{2}
-\Delta q^TJ^TJ\Delta q
+\frac{1}{2}\Delta q^TJ^TJ\Delta q
 -
 \Delta q^TJ^Te
 +
-\frac{1}{2}e^Te
-+
-\frac{\rho}{2}
-\Delta q^T\Delta q.
+\frac{1}{2}e^Te.
 $$
 
-Differentiate with respect to $$\Delta q$$:
+Differentiate the objective with respect to $$\Delta q$$. Because $$J^TJ$$ is symmetric,
 
 $$
-\nabla_{\Delta q}\mathcal{L}
-=
-J^TJ\Delta q
--
-J^Te
-+
-\rho\Delta q.
-$$
-
-Equivalently,
-
-$$
-\nabla_{\Delta q}\mathcal{L}
-=
-J^T
+\nabla_{\Delta q}
 \left(
-J\Delta q-e
+\frac{1}{2}\Delta q^TJ^TJ\Delta q
 \right)
-+
-\rho\Delta q.
+=
+J^TJ\Delta q.
+$$
+
+The derivative of the cross term is
+
+$$
+\nabla_{\Delta q}
+\left(
+-\Delta q^TJ^Te
+\right)
+=
+-J^Te.
+$$
+
+The final term does not depend on $$\Delta q$$, so
+
+$$
+\nabla_{\Delta q}
+\left(
+\frac{1}{2}e^Te
+\right)
+=
+0.
+$$
+
+Combining these terms gives
+
+$$
+\nabla_{\Delta q}\mathcal{L}
+=
+J^TJ\Delta q-J^Te.
 $$
 
 At the minimum, the gradient is zero:
 
 $$
-J^TJ\Delta q
--
-J^Te
+J^TJ\Delta q-J^Te=0.
+$$
+
+Rearranging gives the normal equations
+
+$$
+J^TJ\Delta q=J^Te.
+$$
+
+If $$J^TJ$$ is invertible, multiply both sides by $$(J^TJ)^{-1}$$:
+
+$$
+\Delta q
+=
+(J^TJ)^{-1}J^Te.
+$$
+
+The matrix
+
+$$
+J^\dagger
+=
+(J^TJ)^{-1}J^T
+$$
+
+is the left pseudoinverse of $$J$$ when $$J$$ has full column rank. The Gauss–Newton correction can therefore be written as
+
+$$
+\Delta q=J^\dagger e,
+$$
+
+and the joint configuration is updated according to
+
+$$
+q^{i+1}=q^i+\Delta q^i.
+$$
+
+Gauss–Newton uses the first-order linearization of the pose residual and approximates the curvature of the nonlinear objective using $$J^TJ$$. Unlike full Newton optimization, it does not require second derivatives of the forward-kinematics or pose-error function.
+
+The undamped solution requires $$J^TJ$$ to be invertible and well conditioned. Near a singular configuration, or for a redundant manipulator with more joints than task dimensions, this condition may not hold. Damped least squares resolves this issue by adding a positive regularization term to the Gauss–Newton normal equations.
+
+### Damped Least Squares
+
+Damped least squares adds a penalty on the size of the joint correction:
+
+$$
+\min_{\Delta q}
+\frac{1}{2}\|e-J\Delta q\|^2
 +
-\rho\Delta q
-=
-0.
+\frac{\rho}{2}\|\Delta q\|^2,
 $$
 
-Collecting the terms that multiply $$\Delta q$$ gives
+where $$\rho>0$$ is the damping coefficient.
+
+Differentiating this objective and setting the gradient to zero gives
 
 $$
-\left(
-J^TJ+\rho I_n
-\right)
-\Delta q
-=
-J^Te.
-$$
-
-These are called the regularized normal equations.
-
-Because $$\rho>0$$, the matrix
-
-$$
-J^TJ+\rho I_n
-$$
-
-is invertible. Therefore,
-
-$$
-\Delta q
-=
-\left(
-J^TJ+\rho I_n
-\right)^{-1}
-J^Te.
-$$
-
-This is the joint-space or primal form of the damped least-squares solution.
-
-### Why two equivalent DLS formulas appear
-
-The joint-space form is
-
-$$
-\Delta q
-=
-\left(
-J^TJ+\rho I_n
-\right)^{-1}
-J^Te.
-$$
-
-In this expression, $$J^T$$ appears after the inverse term.
-
-An equivalent task-space form is
-
-$$
-\Delta q
-=
-J^T
-\left(
-JJ^T+\rho I_m
-\right)^{-1}
-e.
-$$
-
-In this expression, $$J^T$$ appears before the inverse term.
-
-The two expressions are equivalent because
-
-$$
-\left(
-J^TJ+\rho I_n
-\right)J^T
-=
-J^T
-\left(
-JJ^T+\rho I_m
-\right).
-$$
-
-To verify this identity, expand the left-hand side:
-
-$$
-\begin{aligned}
-\left(
-J^TJ+\rho I_n
-\right)J^T
-&=
-J^TJJ^T+\rho J^T\\
-&=
-J^T
-\left(
-JJ^T+\rho I_m
-\right).
-\end{aligned}
-$$
-
-Now multiply from the left by
-
-$$
-\left(
-J^TJ+\rho I_n
-\right)^{-1}
-$$
-
-and from the right by
-
-$$
-\left(
-JJ^T+\rho I_m
-\right)^{-1}.
-$$
-
-This gives the push-through identity
-
-$$
-\left(
-J^TJ+\rho I_n
-\right)^{-1}J^T
-=
-J^T
-\left(
-JJ^T+\rho I_m
-\right)^{-1}.
+-J^T(e-J\Delta q)+\rho\Delta q=0.
 $$
 
 Therefore,
 
 $$
+(J^TJ+\rho I)\Delta q=J^Te,
+$$
+
+and the damped correction is
+
+$$
 \boxed{
-\left(
-J^TJ+\rho I_n
-\right)^{-1}J^T
+\Delta q
 =
-J^T
-\left(
-JJ^T+\rho I_m
-\right)^{-1}
-}
+(J^TJ+\rho I)^{-1}J^Te
+}.
 $$
 
-and both formulas produce the same damped least-squares correction.
+Adding $$\rho I$$ makes the matrix invertible even when the Jacobian is singular or rank deficient. It also penalizes excessively large joint corrections, improving numerical stability near singular configurations.
 
-The placement of $$J^T$$ is not caused by commuting $$J^T$$ with an inverse. Matrix multiplication is generally not commutative. The equivalence follows from the specific push-through identity derived above.
+DLS is therefore best understood as a regularized Gauss–Newton method. With a fixed $$\rho$$, it is commonly called fixed-damping DLS. A full Levenberg–Marquardt algorithm adjusts $$\rho$$ according to how successfully each step reduces the objective.
 
-The dimensions also explain why the two formulas look different:
+### Interpretation of the Damping Coefficient
 
-$$
-J\in\mathbb{R}^{m\times n},
-$$
+The damping coefficient controls the balance between the fast Gauss–Newton direction and the more conservative gradient-descent direction.
 
-$$
-J^T\in\mathbb{R}^{n\times m}.
-$$
-
-The joint-space form inverts an $$n\times n$$ matrix:
+When $$\rho$$ is small,
 
 $$
-J^TJ+\rho I_n
-\in
-\mathbb{R}^{n\times n}.
+J^TJ+\rho I
+\approx
+J^TJ,
 $$
 
-The task-space form inverts an $$m\times m$$ matrix:
+so
 
 $$
-JJ^T+\rho I_m
-\in
-\mathbb{R}^{m\times m}.
+\Delta q
+\approx
+(J^TJ)^{-1}J^Te.
 $$
 
-For a redundant manipulator with $$n>m$$, the task-space form usually requires inverting the smaller matrix.
+The update therefore behaves like Gauss–Newton. This usually gives fast convergence when the current configuration is close to a valid solution and the Jacobian is well conditioned.
 
-For a full-pose task,
-
-$$
-m=6.
-$$
-
-Therefore, the task-space form only requires solving a $$6\times6$$ linear system, even when the robot has seven or more joints.
-
-### DLS form used by `diffik_dls.py`
-
-The attached implementation uses
+When $$\rho$$ is large,
 
 $$
-\dot q
+J^TJ+\rho I
+\approx
+\rho I.
+$$
+
+Consequently,
+
+$$
+\Delta q
+\approx
+\frac{1}{\rho}J^Te.
+$$
+
+For
+
+$$
+\Phi(q)=\frac{1}{2}\|e(q)\|^2
+$$
+
+with $$e(q)=x_d-x(q)$$, the gradient is
+
+$$
+\nabla_q\Phi(q)=-J^Te.
+$$
+
+Thus, for large $$\rho$$,
+
+$$
+\Delta q
+\approx
+-\frac{1}{\rho}\nabla_q\Phi(q),
+$$
+
+which is a small step in the negative-gradient direction.
+
+The damping coefficient therefore has the following interpretation:
+
+* small $$\rho$$: faster, Gauss–Newton-like motion;
+* large $$\rho$$: smaller, more stable gradient-descent-like motion;
+* intermediate $$\rho$$: a compromise between convergence speed and robustness.
+
+In an adaptive Levenberg–Marquardt method, $$\rho$$ is reduced when a step successfully decreases the pose error and increased when the local approximation produces a poor step.
+
+The implementation in `diffik_dls.py` uses the equivalent task-space form
+
+$$
+\Delta q
 =
-J^T
-\left(
-JJ^T+\rho I_6
-\right)^{-1}
-V_{\mathrm{cmd}}.
+J^T(JJ^T+\rho I)^{-1}e.
 $$
 
-This corresponds directly to:
+For scalar damping, this is algebraically equivalent to
 
-```python
-controlled_jacobian.T @ np.linalg.solve(
-    controlled_jacobian @ controlled_jacobian.T + self._regularizer,
-    task_velocity,
-)
-```
+$$
+(J^TJ+\rho I)^{-1}J^Te.
+$$
+
+The code uses the task-space form because it solves a system whose size equals the six-dimensional Cartesian task, while the derivation above uses the standard Gauss–Newton form to make the optimization interpretation clearer.
+
 
 ## ▪ Numerical IK versus Differential IK
 
-Numerical IK and differential IK use the same local Jacobian model, but they use it for different purposes. Numerical IK repeats the Jacobian-based update as an internal solver step until it obtains a final joint configuration. Differential IK applies the mapping during physical control time to generate joint-velocity commands.
+Numerical IK and differential IK use the same local Jacobian model, but they solve different problems. Numerical IK repeatedly applies a Jacobian-based correction inside an iterative solver to obtain a final joint configuration. Differential IK operates over physical control time and continuously generates joint-velocity commands.
 
-For damped least-squares numerical IK, the solver computes
+For damped least-squares numerical IK, the solver calculates
 
 $$
 \Delta q^i
 =
-J(q^i)^T
 \left(
-J(q^i)J(q^i)^T+\lambda^2I
+J(q^i)^TJ(q^i)+\rho I
 \right)^{-1}
-e(q^i),
+J(q^i)^Te(q^i),
 $$
 
 followed by
@@ -700,21 +588,90 @@ q^i,\alpha\Delta q^i
 \right).
 $$
 
-Here, $$i$$ is an internal solver-iteration index, and $$\Delta q^i$$ is a joint-configuration correction. It is not necessarily a physically executable joint velocity.
+Here, $$i$$ is an internal solver-iteration index, $$\Delta q^i$$ is a joint-configuration correction, and $$\alpha$$ is a dimensionless numerical step size. The correction $$\Delta q^i$$ is not necessarily a physically executable joint velocity because the solver iterations do not represent elapsed physical time.
 
-For damped least-squares differential IK, the controller computes
+Differential IK instead begins with the velocity-level kinematic relationship
+
+$$
+V_k=J(q_k)\dot q_k.
+$$
+
+Given a commanded Cartesian end-effector velocity $$V_{\mathrm{cmd},k}$$, damped least squares calculates
 
 $$
 \dot q_k
 =
-J(q_k)^T
 \left(
-J(q_k)J(q_k)^T+\lambda^2I
+J(q_k)^TJ(q_k)+\rho I
 \right)^{-1}
-V_{\mathrm{cmd},k},
+J(q_k)^T V_{\mathrm{cmd},k}.
 $$
 
-and integrates the velocity over the physical control timestep:
+Here, $$V_{\mathrm{cmd},k}$$ is a commanded Cartesian twist containing both linear and angular velocity:
+
+$$
+V_{\mathrm{cmd},k}
+=
+\begin{bmatrix}
+v_{\mathrm{cmd},k}\\
+\omega_{\mathrm{cmd},k}
+\end{bmatrix}.
+$$
+
+The term “commanded velocity” is more precise than “commanded speed” because $$V_{\mathrm{cmd},k}$$ contains both magnitude and direction. It specifies how the controller would like the end effector to move at control step $$k$$. Because DLS only approximates this command, especially near singularities, the actual end-effector velocity $$J(q_k)\dot q_k$$ may not exactly equal $$V_{\mathrm{cmd},k}$$.
+
+For pose regulation toward a fixed target, $$V_{\mathrm{cmd},k}$$ is commonly chosen as an error-reducing Cartesian velocity:
+
+$$
+V_{\mathrm{cmd},k}
+=
+K_p e(q_k),
+$$
+
+where $$K_p$$ is a positive task-space feedback gain. This command converts a pose displacement into a velocity that points toward the desired pose.
+
+In the referenced `diffik_dls.py`, the gain is specified through the response time $$\tau$$:
+
+$$
+K_p=\frac{1}{\tau}I.
+$$
+
+The commanded task velocity is therefore
+
+$$
+V_{\mathrm{cmd},k}
+=
+\begin{bmatrix}
+\dfrac{p_d-p(q_k)}{\tau}\\[8pt]
+\dfrac{
+\operatorname{Log}
+\left(
+R_dR(q_k)^T
+\right)^\vee
+}{\tau}
+\end{bmatrix}.
+$$
+
+The upper component commands a linear velocity that reduces the position error, while the lower component commands an angular velocity that reduces the orientation error.
+
+The response time $$\tau$$ is not the control timestep. It determines how aggressively the controller attempts to reduce the pose error:
+
+* a smaller $$\tau$$ produces a larger and more aggressive Cartesian velocity;
+* a larger $$\tau$$ produces a smaller and smoother Cartesian velocity.
+
+Under ideal tracking, $$\tau$$ acts as a time constant; it does not mean that the error becomes exactly zero after $$\tau$$ seconds.
+
+For tracking a moving Cartesian trajectory, the commanded velocity can also include a feedforward term:
+
+$$
+V_{\mathrm{cmd},k}
+=
+V_{d,k}+K_pe(q_k),
+$$
+
+where $$V_{d,k}$$ is the desired trajectory velocity and $$K_pe(q_k)$$ corrects the remaining tracking error. The referenced code uses only the feedback term because it regulates the end effector toward the instantaneous target pose.
+
+After calculating $$\dot q_k$$, differential IK integrates the velocity over the physical control timestep $$\Delta t$$:
 
 $$
 q_{k+1}
@@ -725,23 +682,33 @@ q_k,\Delta t\,\dot q_k
 \right).
 $$
 
-Here, $$k$$ represents physical control time, $$\dot q_k$$ is measured in joint units per second, and $$\Delta t$$ is the controller timestep.
+When position actuators are used, a persistent joint-position reference may instead be integrated:
 
-| Aspect | Numerical IK | Differential IK |
-|---|---|---|
-| Primary output | Final joint configuration $$q^\star$$ | Online joint velocity $$\dot q_k$$ |
-| Independent variable | Solver iteration $$i$$ | Physical control step $$k$$ |
-| Jacobian input | Pose error $$e(q^i)$$ | Commanded Cartesian velocity $$V_{\mathrm{cmd},k}$$ |
-| Update process | Repeats internally until convergence | Usually performs one update per control cycle |
-| Meaning of update | $$\Delta q^i$$ is a numerical configuration correction | $$\dot q_k$$ is a physical velocity command |
-| Velocity limits | Not automatically meaningful or enforced | Must be enforced on the commanded velocity |
-| Typical purpose | Solving for a static target configuration | Online Cartesian tracking and feedback control |
-| Execution | Requires a trajectory generator or controller to reach $$q^\star$$ | Directly generates commands during robot operation |
-| Constraints | Basic DLS does not enforce joint or collision constraints | Constraints can be incorporated through a velocity-level QP |
+$$
+q_{\mathrm{ref},k+1}
+=
+\operatorname{integrate}
+\left(
+q_{\mathrm{ref},k},\Delta t\,\dot q_k
+\right).
+$$
 
-Damped least squares alone does not enforce joint-position or joint-velocity limits in either formulation. Numerical IK requires a constrained solver when the final configuration must remain within joint bounds. Differential IK commonly uses a quadratic program to enforce velocity limits and predictive joint-position constraints during online control.
+This is the approach used in `diffik_dls.py`.
 
-The remainder of this section focuses on numerical IK as a configuration solver. Differential IK and its constrained QP formulation are developed later as online control methods.
+| Aspect               | Numerical IK                                                            | Differential IK                                             |
+| -------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Primary output       | Final joint configuration $$q^\star$$                                   | Online joint velocity $$\dot q_k$$                          |
+| Independent variable | Solver iteration $$i$$                                                  | Physical control step $$k$$                                 |
+| Jacobian input       | Pose displacement $$e(q^i)$$                                            | Cartesian velocity $$V_{\mathrm{cmd},k}$$                   |
+| Meaning of output    | $$\Delta q^i$$ is a numerical configuration correction                  | $$\dot q_k$$ is a physical velocity command                 |
+| Update scale         | Numerical step size $$\alpha$$                                          | Physical timestep $$\Delta t$$                              |
+| Update process       | Repeats internally until convergence                                    | Usually performs one update per control cycle               |
+| Velocity limits      | Do not directly apply to an internal solver step                        | Must be enforced on the physical velocity command           |
+| Typical purpose      | Finding a configuration for a target pose                               | Online Cartesian regulation or trajectory tracking          |
+| Execution            | A trajectory generator or controller must move the robot to $$q^\star$$ | Continuously generates commands during operation            |
+| Constraints          | Basic DLS does not enforce constraints                                  | Constraints can be incorporated through a velocity-level QP |
+
+Both numerical and differential DLS are unconstrained in their basic forms. Damping reduces the amplification of joint motion near singularities, but it does not impose hard joint-position, velocity, or collision limits. Numerical IK therefore requires explicit joint-limit handling when computing $$q^\star$$, while constrained differential IK and its QP formulation will be discussed later in the Control chapter.
 
 ----
 Reference:
