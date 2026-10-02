@@ -23,15 +23,9 @@ By default, all generated HTML pages are indexed using the following data points
 - Page content
 - Page URL
 
-## Enable search in configuration
+## Note
 
-In your site's `_config.yml`, enable search:
-
-```yaml
-# Enable or disable the site search
-# Supports true (default) or false
-search_enabled: true
-```
+kl divergence, CVAE test time style variable.
 
 ### Search granularity
 
@@ -40,74 +34,16 @@ The sections are defined by the headings on the page.
 Each section is displayed in a separate search result.
 
 ```yaml
-# Split pages into sections that can be searched individually
-# Supports 1 - 6, default: 2
-search.heading_level: 2
+Current qpos + demonstrated action chunk
+                    ↓
+              CVAE encoder
+                    ↓
+               mu, logvar
+                    ↓
+              sample latent z
+                    ↓
+Images + current qpos + z → action decoder → a_hat
 ```
-
-### Search previews
-
-A search result can contain previews that show where the search words are found in the specific section.
-
-```yaml
-# Maximum amount of previews per search result
-# Default: 3
-search.previews: 3
-
-# Maximum amount of words to display before a matched word in the preview
-# Default: 5
-search.preview_words_before: 5
-
-# Maximum amount of words to display after a matched word in the preview
-# Default: 10
-search.preview_words_after: 10
-```
-
-### Search tokenizer
-
-The default is for hyphens to separate tokens in search terms:
-`gem-based` is equivalent to `gem based`, matching either word.
-To allow search for hyphenated words:
-
-```yaml
-# Set the search token separator
-# Default: /[\s\-/]+/
-# Example: enable support for hyphenated search words
-search.tokenizer_separator: /[\s/]+/
-```
-
-### Display URL in search results
-
-```yaml
-# Display the relative url in search results
-# Supports true (default) or false
-search.rel_url: false
-```
-
-### Display search button
-
-The search button displays in the bottom right corner of the screen and triggers the search input when clicked.
-
-```yaml
-# Enable or disable the search button that appears in the bottom right corner of every page
-# Supports true or false (default)
-search.button: true
-```
-
-### Focus search bar with a keyboard shortcut
-
-Just the Docs supports focusing the search bar input with a keyboard shortcut. After setting the `search.focus_shortcut_key` config item key, users who press <kbd>Ctrl</kbd> + `search.focus_shortcut_key` (or on macOS, <kbd>Command</kbd> + `search.focus_shortcut_key`) will focus the search bar.
-
-Note that this feature is **disabled by default**. `search.focus_shortcut_key` should be a [valid value from `KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key); this involves all ASCII alphanumeric values, as well as modifier keys.
-
-For example,
-
-```yaml
-search:
-    focus_shortcut_key: 'k'
-```
-
-Will make <kbd>Ctrl</kbd> + <kbd>K</kbd> focus the search bar for Windows users (and <kbd>Command</kbd> + <kbd>K</kbd> on macOS).
 
 ## Hiding pages from search
 
@@ -179,3 +115,11 @@ This example adds front matter `usage` and `examples` fields to the search index
 const content_to_merge = [docs[i].content, docs[i].myusage, docs[i].myexamples];
 docs[i].content = content_to_merge.join(' ');
 ```
+
+### Reference
+1. <i class="fab fa-youtube"></i> [Variational Autoencoder - Model, ELBO, loss function and maths explained easily!](https://www.youtube.com/watch?v=iwEzwTTalbg)
+
+2. <i class="fab fa-youtube"></i> [(Conditional) Variational Autoencoder](https://www.youtube.com/watch?v=liXZwc32Tg8) 
+
+
+ 
